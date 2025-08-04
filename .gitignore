@@ -1,0 +1,7 @@
+# Ignore dependencies
+node_modules/
+
+# Optional: other safe-to-ignore files
+.env
+uploads/
+*.zip
