@@ -48,6 +48,58 @@ app.get('/api/customers/:id', (req, res) => {
   });
 });
 
+
+
+// Get all orders for a specific customer
+app.get('/api/customers/:id/orders', (req, res) => {
+  const customerId = req.params.id;
+
+  // First check if customer exists
+  const userQuery = `SELECT * FROM users WHERE id = ?`;
+  db.query(userQuery, [customerId], (err, users) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (users.length === 0)
+      return res.status(404).json({ error: 'Customer not found' });
+
+    const orderQuery = `SELECT * FROM orders WHERE user_id = ?`;
+    db.query(orderQuery, [customerId], (err, orders) => {
+      if (err) return res.status(500).json({ error: 'Error fetching orders' });
+
+      res.status(200).json({
+        customer_id: customerId,
+        orders: orders,
+        total_orders: orders.length
+      });
+    });
+  });
+});
+
+
+// Get specific order details
+app.get('/api/orders/:orderId', (req, res) => {
+  const orderId = req.params.orderId;
+
+  const query = `SELECT * FROM orders WHERE order_id = ?`;
+  db.query(query, [orderId], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+
+    if (results.length === 0)
+      return res.status(404).json({ error: 'Order not found' });
+
+    res.status(200).json(results[0]);
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
 // Default route
 app.get('/', (req, res) => {
   res.send('🚀 API is running...');
